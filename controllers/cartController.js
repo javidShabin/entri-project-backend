@@ -4,8 +4,8 @@ const { Menu } = require("../models/menuModel");
 // Add items in cart
 const addItemToCart = async (req, res) => {
   try {
-    const { items } = req.body;
-    const userId = req.user.id;
+    const { items } = req.body; // Get item from req.body
+    const userId = req.user.id; // Get user id from req.user
 
     // Validate the items input
     if (!Array.isArray(items) || items.length === 0) {
@@ -86,8 +86,8 @@ const addItemToCart = async (req, res) => {
 // Update the cart
 const updateCart = async (req, res) => {
   try {
-    const { items } = req.body;
-    const userId = req.user.id;
+    const { items } = req.body; // Get item from req.body
+    const userId = req.user.id; // Get user id from req.user
 
     // Check if files are present
     if (!items || !Array.isArray(items) || items.length === 0) {
