@@ -16,7 +16,8 @@ const addItemToCart = async (req, res) => {
 
     // Find or create the user's cart
     let cart =
-      (await Cart.findOne({ userId })) || new Cart({ userId, items: [], totalPrice: 0 });
+      (await Cart.findOne({ userId })) ||
+      new Cart({ userId, items: [], totalPrice: 0 });
 
     // Prepare to store menu items and their details
     const menuItemIds = items.map(({ menuItem }) => menuItem);
@@ -83,8 +84,61 @@ const addItemToCart = async (req, res) => {
 };
 
 // Update the cart
-const updateCart = async () => {
+const updateCart = async (req, res) => {
   try {
+    const { items } = req.body;
+    const userId = req.user.id;
+
+    // Check if files are present
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({
+        message: "Items array is required and should not be empty.",
+      });
+    }
+
+    // Find the user's cart
+    let cart = await Cart.findOne({ userId });
+    if (!cart) {
+      return res.status(404).json({
+        message: "Cart not found.",
+      });
+    }
+    // Loop through the items and update the quantity or other properties
+    for (let { menuItem, quantity } of items) {
+      const itemIndex = cart.items.findIndex(
+        (item) => item.menuItem.toString() === menuItem
+      );
+
+      if (itemIndex > -1) {
+        // If item exists, update the quantity
+        cart.items[itemIndex].quantity = quantity;
+
+        // Optional: If the quantity is 0 or less, remove the item from the cart
+        if (quantity <= 0) {
+          cart.items.splice(itemIndex, 1);
+        }
+      } else {
+        return res.status(404).json({
+          message: `Menu item with ID ${menuItem} not found in the cart.`,
+        });
+      }
+    }
+    // Recalculate the total price
+    let totalPrice = 0;
+    for (let item of cart.items) {
+      const menuItemDetails = await Menu.findById(item.menuItem);
+      if (menuItemDetails) {
+        totalPrice += menuItemDetails.price * item.quantity;
+      } else {
+        return res.status(404).json({
+          message: "One or more menu items were not found.",
+        });
+      }
+    }
+    cart.totalPrice = totalPrice;
+    // Save the updated cart
+    await cart.save();
+    res.status(200).json(cart);
   } catch (error) {}
 };
 // Cart detials

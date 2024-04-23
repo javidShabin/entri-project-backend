@@ -6,7 +6,7 @@ const router = express.Router()
 // Create cart
 router.post("/create-cart", userAuth, addItemToCart)
 // Update the cart
-router.put("/updateCart", updateCart)
+router.put("/updateCart", userAuth, updateCart)
 // Get cart details
 router.get("/cart-details", cartDetails)
 // Remove item from cart
