@@ -142,8 +142,17 @@ const updateCart = async (req, res) => {
   } catch (error) {}
 };
 // Cart detials
-const cartDetails = async () => {
+const getCartDetails = async (req, res) => {
   try {
+    const userId = req.user.id; // Get the user id from req.user
+    // Find the cart details using user id
+    const cart = await Cart.findOne({ userId });
+    // If didnt find the cart details send error as respone
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found." });
+    }
+    // If find
+    res.status(200).json(cart);
   } catch (error) {}
 };
 // Remove from cart
@@ -159,7 +168,7 @@ const clearCart = async () => {
 module.exports = {
   addItemToCart,
   updateCart,
-  cartDetails,
+  getCartDetails,
   removeFromCart,
   clearCart,
 };
