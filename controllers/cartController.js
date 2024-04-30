@@ -156,8 +156,43 @@ const getCartDetails = async (req, res) => {
   } catch (error) {}
 };
 // Remove from cart
-const removeFromCart = async () => {
+const removeFromCart = async (req, res) => {
   try {
+    const { menuItem } = req.body; // Get the menu item from req.body
+    const userId = req.user.id; // Get the user id from req.user
+
+    // Check the menu item present or not
+    if (!menuItem) {
+      return res.status(400).json({
+        message: "menu item is required.",
+      });
+    }
+    // Find cart using user id
+    const cart = await Cart.findOne({userId});
+
+    // Check have any cart for the user in databse
+    if (!cart) {
+      return res.status(404).json({
+        message: "cart not found.",
+      });
+    }
+    cart.items = cart.items.filter(
+      (item) => item.menuItem.toString() !== menuItem
+    );
+
+    // recalculate total price
+    let totalPrice = 0;
+    for (let item of cart.items) {
+      const menuItemDetails = await Menu.findById(item.menuItem);
+      if (menuItemDetails) {
+        totalPrice += menuItemDetails.price * item.quantity;
+      }
+    }
+
+    cart.totalPrice = totalPrice;
+
+    await cart.save();
+    res.status(200).json(cart);
   } catch (error) {}
 };
 // Clear cart

@@ -10,7 +10,7 @@ router.put("/updateCart", userAuth, updateCart)
 // Get cart details
 router.get("/cart-details", userAuth, getCartDetails)
 // Remove item from cart
-router.delete("/removeCart", removeFromCart)
+router.delete("/removeCart", userAuth, removeFromCart)
 // Clear the all  cart
 router.delete("/clear-cart", clearCart)
 
