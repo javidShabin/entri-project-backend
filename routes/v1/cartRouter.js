@@ -12,7 +12,7 @@ router.get("/cart-details", userAuth, getCartDetails)
 // Remove item from cart
 router.delete("/removeCart", userAuth, removeFromCart)
 // Clear the all  cart
-router.delete("/clear-cart", clearCart)
+router.delete("/clear-cart", userAuth, clearCart)
 
 
 module.exports = {cartRouter : router}
