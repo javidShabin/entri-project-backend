@@ -139,7 +139,9 @@ const updateCart = async (req, res) => {
     // Save the updated cart
     await cart.save();
     res.status(200).json(cart);
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json(error)
+  }
 };
 // Cart detials
 const getCartDetails = async (req, res) => {
@@ -153,7 +155,9 @@ const getCartDetails = async (req, res) => {
     }
     // If find
     res.status(200).json(cart);
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json(error)
+  }
 };
 // Remove from cart
 const removeFromCart = async (req, res) => {
@@ -193,7 +197,9 @@ const removeFromCart = async (req, res) => {
 
     await cart.save();
     res.status(200).json(cart);
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json(error)
+  }
 };
 // Clear cart
 const clearCart = async (req, res) => {
