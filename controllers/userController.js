@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const { generateToken } = require("../utils/token");
 const { TempUser } = require("../models/tembUser");
+const { cloudinaryInstance } = require("../config/cloudinaryConfig");
 
 const userRegistration = async (req, res) => {
   try {
@@ -222,7 +223,52 @@ const userProfile = async (req, res) => {
 // Update user profile
 const updateUserProfile = async (req, res) => {
   try {
-  } catch (error) {}
+    // Get user from request
+    const { user } = req;
+    // Get datas from req.body
+    const { name, email, phone } = req.body;
+    // Store update in a variable
+    const updateData = { name, email, phone };
+    // Declare a variable
+    let uploadResult;
+
+    // Add image file and update the image
+    if (req.file) {
+      try {
+        uploadResult = await cloudinaryInstance.uploader.upload(req.file.path);
+        // Assign the uploaded image URL to the user's image field
+        updateData.image = uploadResult.secure_url;
+      } catch (uploadError) {
+        return res.status(500).json({
+          success: false,
+          message: "File upload failed",
+          error: uploadError.message,
+        });
+      }
+    }
+    // Updated user
+    const updatedUser = await User.findByIdAndUpdate(user.id, updateData, {
+      new: true,
+    });
+    // Check have any updated user
+    if (!updatedUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+    // Send response
+    res.json({
+      success: true,
+      message: "User profile updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: "Error updating profile",
+      error: error.message,
+    });
+  }
 };
 // Delete user
 const deleteUser = async (req, res) => {
