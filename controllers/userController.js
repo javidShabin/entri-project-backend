@@ -199,7 +199,25 @@ const userLogOut = async (req, res) => {
 // Get user profile
 const userProfile = async (req, res) => {
   try {
-  } catch (error) {}
+    // Get user from request
+    const { user } = req;
+    // Get needed user data
+    const userData = await User.findOne({ _id: user.id });
+    const { image, name, email, phone, _id } = userData;
+
+    // Send the data as json response
+    res.json({
+      success: true,
+      message: "User profile",
+      image,
+      name,
+      email,
+      phone,
+      _id,
+    });
+  } catch (error) {
+    res.status(401).json(error);
+  }
 };
 // Update user profile
 const updateUserProfile = async (req, res) => {
