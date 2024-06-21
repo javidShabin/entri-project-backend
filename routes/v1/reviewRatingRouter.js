@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post("/create-review", userAuth, createReview);
 router.get("/get-all-reivews", getReview);
-router.put("/edit-review/:id", updateReview);
+router.put("/edit-review/:reviewId",userAuth, updateReview);
 router.delete("/revome-review/:id", removeReview);
 
 module.exports = { reviewRatingRouter: router };
