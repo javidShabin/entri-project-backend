@@ -104,7 +104,29 @@ const updateReview = async (req, res) => {
 // Remove review
 const removeReview = async (req, res) => {
   try {
-  } catch (error) {}
+    // Get the reviewId from req.params
+    const { reviewId } = req.params;
+
+    // Check if reviewId was provided
+    if (!reviewId) {
+      return res.status(400).json({ message: "Review ID is required" });
+    }
+
+    // Find and delete the review
+    const review = await Review.findByIdAndDelete(reviewId);
+
+    // If no review is found, send a 404 response
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    // Send a success response if the review is deleted
+    res.status(200).json({ message: "Review deleted successfully" });
+  } catch (error) {
+    res.status(500).json({
+      message: "An error occurred while deleting the review.",
+    });
+  }
 };
 
 module.exports = {

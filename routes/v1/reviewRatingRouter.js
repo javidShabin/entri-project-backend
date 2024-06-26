@@ -11,6 +11,6 @@ const router = express.Router();
 router.post("/create-review", userAuth, createReview);
 router.get("/get-all-reivews", getReview);
 router.put("/edit-review/:reviewId",userAuth, updateReview);
-router.delete("/revome-review/:id", removeReview);
+router.delete("/revome-review/:reviewId", removeReview);
 
 module.exports = { reviewRatingRouter: router };
