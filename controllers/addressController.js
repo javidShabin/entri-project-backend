@@ -56,7 +56,14 @@ const getAddress = async (req, res) => {
 };
 const removeAddress = async (req, res) => {
   try {
-  } catch (error) {}
+    const userId = req.user.id; // Get address from req.user
+    // Find and delete the address using the user id
+    await Address.findByIdAndDelete(userId);
+    // Send message as response
+    res.status(200).json({ message: "Address deleted successfully" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 module.exports = {
