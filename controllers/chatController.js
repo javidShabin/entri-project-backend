@@ -6,6 +6,11 @@ const sendMessage = async (req, res) => {
   try {
     // Destructure the user id messahe and sender from req.body
     const { userId, message, sender } = req.body;
+
+    // Check if required filds are presint
+    if (!userId || !message || !sender) {
+        return res.status(401).json({message: "All fileds are rquiresd"})
+    }
     // Check if the sender is admin or user
     const newMessage = new Chat({
       user: userId, // User to whom the message is being sent
