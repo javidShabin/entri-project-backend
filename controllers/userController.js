@@ -75,7 +75,6 @@ const userRegistration = async (req, res) => {
     });
   }
 };
-
 // Otp verifying and create user
 const verifyOtpAndCreateUser = async (req, res) => {
   try {
@@ -139,9 +138,37 @@ const verifyOtpAndCreateUser = async (req, res) => {
   }
 };
 // Login user
+const userLogin = async (req, res) => {
+  try {
+  } catch (error) {}
+};
 // Logout user
+const userLogOut = async (req, res) => {
+  try {
+  } catch (error) {}
+};
 // Get user profile
+const userProfile = async (req, res) => {
+  try {
+  } catch (error) {}
+};
 // Update user profile
+const updateUserProfile = async (req, res) => {
+  try {
+  } catch (error) {}
+};
 // Delete user
+const deleteUser = async (req, res) => {
+  try {
+  } catch (error) {}
+};
 
-module.exports = { userRegistration, verifyOtpAndCreateUser };
+module.exports = {
+  userRegistration,
+  verifyOtpAndCreateUser,
+  userLogin,
+  userLogOut,
+  userProfile,
+  updateUserProfile,
+  deleteUser,
+};
