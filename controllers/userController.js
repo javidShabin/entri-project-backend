@@ -174,6 +174,14 @@ const userLogin = async (req, res) => {
     res.status(404).json({ message: "faild to user login" });
   }
 };
+// Useres list
+const getAllUsers = async (req, res) => {
+  try {
+    
+  } catch (error) {
+    
+  }
+}
 // Logout user
 const userLogOut = async (req, res) => {
   try {
@@ -199,6 +207,7 @@ module.exports = {
   userRegistration,
   verifyOtpAndCreateUser,
   userLogin,
+  getAllUsers,
   userLogOut,
   userProfile,
   updateUserProfile,
