@@ -18,3 +18,9 @@ const removeAllChats = async (req, res) => {
   try {
   } catch (error) {}
 };
+module.exports = {
+  sendMessage,
+  getChatHistory,
+  getUsersWithChats,
+  removeAllChats
+};
