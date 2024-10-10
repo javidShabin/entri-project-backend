@@ -1,7 +1,20 @@
 // Send message
 const sendMessage = async (req, res) => {
   try {
-  } catch (error) {}
+    // Destructure the user id messahe and sender from req.body
+    const { userId, message, sender } = req.body;
+    // Check if the sender is admin or user
+    const newMessage = new Chat({
+      user: userId, // User to whom the message is being sent
+      message,
+      sender, // 'admin' or 'user', depends on who is sending
+    });
+    // Save the message to datahase
+    await newMessage.save();
+    res.status(201).json(newMessage); // Send the response including message
+  } catch (error) {
+    res.status(500).json({ error: "Failed to send message" });
+  }
 };
 // Get chat history
 const getChatHistory = async (req, res) => {
@@ -22,5 +35,5 @@ module.exports = {
   sendMessage,
   getChatHistory,
   getUsersWithChats,
-  removeAllChats
+  removeAllChats,
 };
