@@ -19,7 +19,17 @@ const sendMessage = async (req, res) => {
 // Get chat history
 const getChatHistory = async (req, res) => {
   try {
-  } catch (error) {}
+    // Destructure user id from req.params
+    const { userId } = req.params;
+    // Fetch all chat messages between the admin and the specific user
+    const chatMessages = await Chat.find({ user: userId }).sort({
+      createdAt: 1,
+    });
+    // send the response 
+    res.status(200).json(chatMessages);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch chat history" });
+  }
 };
 // Fetch a list of all users who have chatted with the admin
 const getUsersWithChats = async (req, res) => {
