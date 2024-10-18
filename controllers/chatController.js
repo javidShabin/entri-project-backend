@@ -48,8 +48,16 @@ const getUsersWithChats = async (req, res) => {
 };
 // Clear all chats for a specific user
 const removeAllChats = async (req, res) => {
-  try {
-  } catch (error) {}
+    try {
+        // Destructur the user id from req.params
+        const { userId } = req.params;
+        // Cleat the chat using user id
+        await Chat.deleteMany({ user: userId });
+        // Semd the response
+        res.status(200).json({ message: "All chats removed successfully" });
+      } catch (error) {
+        res.status(500).json({ error: "Failed to remove chat history" });
+      }
 };
 module.exports = {
   sendMessage,
