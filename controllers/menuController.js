@@ -62,10 +62,12 @@ const getMenusByCategory = async (req, res) => {
     const menus = await Menu.find({ restaurantId, category });
     // Check the category in the menu items
     if (menus.length === 0) {
-        return res.status(401).json({message: "The category not found"})
+      return res.status(401).json({ message: "The category not found" });
     }
     res.status(200).json({ success: true, menus });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
 };
 // Search menu By name
 const searchMenuByName = async (req, res) => {
