@@ -16,7 +16,7 @@ router.post("/create-menu", upload.single("image"), createMenuItem);
 // Get menus by restaurant id
 router.get("/menu/:restaurantId", getMenuforRestaurant);
 // Get menu by gategory
-router.get("/menu/:restaurantId/:category", getMenusByCategory);
+router.get("/menu/:restaurantId/category/:category", getMenusByCategory);
 // Search menu by name
 router.get("/menu/:restaurantId/search", searchMenuByName);
 // Filter menu bt price

@@ -45,7 +45,7 @@ const getMenuforRestaurant = async (req, res) => {
     // Find the menus using restaurant id
     const menus = await Menu.find({ restaurantId });
     if (!menus) {
-        return res.status(401).json({message: "Menus not found"})
+      return res.status(401).json({ message: "Menus not found" });
     }
     // Else send the menu items as resonse
     res.status(200).json({ success: true, menus });
@@ -56,6 +56,15 @@ const getMenuforRestaurant = async (req, res) => {
 // Get menu by category
 const getMenusByCategory = async (req, res) => {
   try {
+    // Destructure restaurantId, category
+    const { restaurantId, category } = req.params;
+    // Find menu from catagory using catagory
+    const menus = await Menu.find({ restaurantId, category });
+    // Check the category in the menu items
+    if (menus.length === 0) {
+        return res.status(401).json({message: "The category not found"})
+    }
+    res.status(200).json({ success: true, menus });
   } catch (error) {}
 };
 // Search menu By name
