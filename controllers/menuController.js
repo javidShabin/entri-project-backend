@@ -72,6 +72,19 @@ const getMenusByCategory = async (req, res) => {
 // Search menu By name
 const searchMenuByName = async (req, res) => {
   try {
+    const { restaurantId } = req.params;
+    const { name } = req.query;
+    // Find the items using name
+    const menus = await Menu.find({
+      restaurantId,
+      name: { $regex: name, $options: "i" }, // case-insensitive search
+    });
+    // Check the item have in items
+    if (menus.length === 0) {
+      return res.status(401).json({ message: "The category not found" });
+    }
+    // Have the items send the response
+    res.status(200).json({ success: true, menus });
   } catch (error) {}
 };
 // Filter menu by price
