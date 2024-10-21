@@ -72,8 +72,8 @@ const getMenusByCategory = async (req, res) => {
 // Search menu By name
 const searchMenuByName = async (req, res) => {
   try {
-    const { restaurantId } = req.params;
-    const { name } = req.query;
+    const { restaurantId } = req.params; // Destructure restaurantId from req.params
+    const { name } = req.query; // Destructure name from req.query
     // Find the items using name
     const menus = await Menu.find({
       restaurantId,
@@ -90,7 +90,22 @@ const searchMenuByName = async (req, res) => {
 // Filter menu by price
 const filterMenusByPrice = async (req, res) => {
   try {
-  } catch (error) {}
+    const { restaurantId } = req.params; // Destructure restaurantId from req.params
+    const { minPrice, maxPrice } = req.query; // Destructure minimum and maximum price from req.query
+    // Find the item using price
+    const menus = await Menu.find({
+      restaurantId,
+      price: { $gte: minPrice || 0, $lte: maxPrice || Infinity },
+    });
+    // Check the item in the pricerange
+    if (menus.length === 0) {
+      return res.status(401).json({ message: "The category not found" });
+    }
+    // Send the respone have any items
+    res.status(200).json({ success: true, menus });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
 };
 // Update a menu item
 const updateMenu = async (req, res) => {
