@@ -4,15 +4,15 @@ const { addToCart, updateCart, cartDetails, removeFromCart, clearCart } = requir
 const router = express.Router()
 
 // Create cart
-router.post("/create-cart", userAuth, addToCart)
+router.post("/create-cart", addToCart)
 // Update the cart
-router.put("/updateCart", userAuth, updateCart)
+router.put("/updateCart", updateCart)
 // Get cart details
-router.get("/cart-details", userAuth, cartDetails)
+router.get("/cart-details", cartDetails)
 // Remove item from cart
-router.delete("/removeCart", userAuth, removeFromCart)
+router.delete("/removeCart", removeFromCart)
 // Clear the all  cart
-router.delete("/clear-cart", userAuth, clearCart)
+router.delete("/clear-cart", clearCart)
 
 
 module.exports = {cartRouter : router}
