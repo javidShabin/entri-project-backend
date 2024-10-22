@@ -8,10 +8,11 @@ const {
   updateMenu,
   deleteMenu,
 } = require("../../controllers/menuController");
+const { upload } = require("../../middleware/multer");
 const router = express.Router();
 
 // Create menu
-router.post("/create-menu", createMenuItem);
+router.post("/create-menu", upload.single("image"), createMenuItem);
 // Get menus by restaurant id
 router.get("/menu/:restaurantId", getMenuforRestaurant);
 // Get menu by gategory
