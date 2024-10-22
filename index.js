@@ -12,7 +12,7 @@ app.use(express.json())
 // Database connection
 dbConnection()
 
-app.use('api', apiRouter)
+app.use('/api', apiRouter)
 
 app.listen(port, () => {
     console.log(`The server running in port${port}`)
