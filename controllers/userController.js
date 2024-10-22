@@ -1,61 +1,79 @@
 const { User } = require("../models/userModel");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 const { generateToken } = require("../utils/token");
+const { TempUser } = require("../models/tembUser");
 
-// Register user
 const userRegistration = async (req, res) => {
   try {
-    // Get all fields from request body
-    const { email, password, conformPass, ...rest } = req.body;
-    // Check if required field are presented
-    if (!email || !password || !conformPass) {
-      return res.status(401).json({ message: "All fields are required" });
+    const { email, password, confirmPass, ...rest } = req.body;
+
+    // Check if required fields are present
+    if (!email || !password || !confirmPass) {
+      return res.status(400).json({ message: "All fields are required" });
     }
-    // Check mating for conform password
-    if (password !== conformPass) {
-      return res.status(401).json({ message: "Passwords do not match" });
+
+    // Check if passwords match
+    if (password !== confirmPass) {
+      return res.status(400).json({ message: "Passwords do not match" });
     }
-    // Check the user already exist or not
-    // If the user already exist then send response error
+
+    // Check if user already exists
     const isUserExist = await User.findOne({ email });
     if (isUserExist) {
       return res.status(409).json({ message: "User already exists" });
     }
-    // Hash the user password for security
+
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000);
+
+    // Send OTP via email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: "Your OTP for Registration",
+      text: `Your OTP is ${otp}. Please verify to complete your registration.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    // Hash the password
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    // Creat the user and add the hashed password to the user password
-    const newUser = new User({
+
+    // Save temporary user data with OTP (but don't create the user yet)
+    const newUser = new TempUser({
       email,
       ...rest,
       password: hashedPassword,
+      otp, // Store OTP for verification
+      otpExpiresAt: Date.now() + 10 * 60 * 1000, // OTP valid for 10 minutes
     });
+
     await newUser.save();
 
-    // Generate token for user
-    const token = generateToken({
-      _id: newUser._id,
-      email: newUser.email,
-      role: "customer",
-    });
-    // Pass the token as a cookie (the token will expire in one hour)
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
-    // Return a success response
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message: "User created successfully",
+      message: "OTP sent to your email. Please verify within 10 minutes.",
     });
   } catch (error) {
-    console.error(error); // Log the error for debugging
-    res
-      .status(500)
-      .json({ message: "User creation failed", error: error.message });
+    console.error(error);
+    res.status(500).json({
+      message: "Registration failed",
+      error: error.message,
+    });
   }
 };
+
+// Otp verifying
 // Login user
 // Logout user
 // Get user profile
