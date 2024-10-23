@@ -177,15 +177,24 @@ const userLogin = async (req, res) => {
 // Useres list
 const getAllUsers = async (req, res) => {
   try {
-    
+    const users = await User.find({});
+    res.status(200).json(users);
   } catch (error) {
-    
+    res.status(404).json({ message: "Server not responese..." });
   }
-}
+};
 // Logout user
 const userLogOut = async (req, res) => {
   try {
-  } catch (error) {}
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+    });
+    res.json({ success: true, message: "User logged out" });
+  } catch (error) {
+    console.log(error);
+  }
 };
 // Get user profile
 const userProfile = async (req, res) => {
