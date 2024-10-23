@@ -7,17 +7,23 @@ const {
   userLogOut,
   userProfile,
   updateUserProfile,
+  forgotPassword,
+  deleteUser,
+  checkUser,
 } = require("../../controllers/userController");
 const { userAuth } = require("../../middleware/userAuth");
 const { upload } = require("../../middleware/multer");
 const router = express.Router();
 
-router.use("/register", userRegistration);
-router.use("/otpVerify", verifyOtpAndCreateUser);
-router.use("/login", userLogin);
-router.use("/users-list", getAllUsers);
-router.use("/logout", userLogOut);
-router.use("/user-profile", userAuth, userProfile);
-router.use("update-profile", userAuth, upload.single("image"), updateUserProfile)
+router.post("/register", userRegistration);
+router.post("/otpVerify", verifyOtpAndCreateUser);
+router.post("/login", userLogin);
+router.put("/forget-password", forgotPassword);
+router.get("/users-list", getAllUsers);
+router.post("/logout", userLogOut);
+router.get("/user-profile", userAuth, userProfile);
+router.put("/update-profile", userAuth, upload.single("image"), updateUserProfile);
+router.delete("/remove-user/:id", deleteUser)
+router.get("/check-user", checkUser)
 
 module.exports = { userRouter: router };

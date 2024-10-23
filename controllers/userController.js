@@ -5,6 +5,7 @@ const { generateToken } = require("../utils/token");
 const { TempUser } = require("../models/tembUser");
 const { cloudinaryInstance } = require("../config/cloudinaryConfig");
 
+// Register user
 const userRegistration = async (req, res) => {
   try {
     const { email, password, confirmPass, name, phone, ...rest } = req.body;
@@ -270,10 +271,77 @@ const updateUserProfile = async (req, res) => {
     });
   }
 };
+
+// Forget password
+const forgotPassword = async (req, res) => {
+  try {
+    // Get data from req.body
+    const { email, password } = req.body;
+    // Check if present the email
+    if (!email || !password) {
+      return res.status(401).json({ message: "Fileds are required" });
+    }
+    // Check the user exist or not
+    const isUserExist = await User.findOne({ email });
+    if (!isUserExist) {
+      return res.status(401).json({ message: "The user not not found" });
+    }
+    // Hash the new password
+    const saltRounds = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    // Update the user's password
+    isUserExist.password = hashedPassword;
+    // Save the updated user data
+    await isUserExist.save();
+    return res.status(200).json({
+      message: "Password has been updated successfully",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error while updating password", error: error.message });
+  }
+};
 // Delete user
 const deleteUser = async (req, res) => {
   try {
-  } catch (error) {}
+    // Extrat user id form request params
+    const { id } = req.params;
+    // Use findByIdAndDelete to remove the user
+    const deleteUser = await User.findByIdAndDelete(id);
+    // If user not found, return an error
+    if (!deleteUser) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: "Error deleting user",
+      error: error.message,
+    });
+  }
+};
+// Check user
+const checkUser = async () => {
+  try {
+    // Get user from req.user
+    const { user } = req;
+    // Check user authorizes or not
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "user not autherised" });
+    }
+    // If user authorized
+    res.json({ success: true, message: "user autherised" });
+  } catch (error) {
+    res.status(401).json(error);
+  }
 };
 
 module.exports = {
@@ -281,8 +349,10 @@ module.exports = {
   verifyOtpAndCreateUser,
   userLogin,
   getAllUsers,
+  forgotPassword,
   userLogOut,
   userProfile,
   updateUserProfile,
   deleteUser,
+  checkUser
 };
