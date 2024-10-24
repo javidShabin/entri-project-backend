@@ -1,50 +1,26 @@
 const mongoose = require("mongoose");
 
-// Define the schema for a menu item
 const menuItemSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-    },
+    name: { type: String, required: true },
     description: String,
-    price: {
-      type: Number,
-      required: true,
-      min: 0, // Ensure price is not negative
-      max: 1000, // Example maximum price
-    },
-    image: {
-      type: String, // URL for the image
-    },
+    price: { type: Number, required: true, min: 0 },
+    image: { type: String },
     category: {
       type: String,
       enum: ["Appetizer", "Main Course", "Dessert", "Beverage"],
-      required: true, // Make it required
+      required: true, 
     },
   },
   { timestamps: true }
 );
 
-// Define the schema for a restaurant
 const restaurantSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      unique: true, // Ensure unique names for restaurants
-    },
-    location: {
-      type: String,
-      required: true,
-    },
-    cuisine: {
-      type: String,
-      required: true,
-    },
-    image: {
-      type: String, // URL for the image
-    },
+    name: { type: String, required: true, unique: true },
+    location: { type: String, required: true },
+    cuisine: { type: String, required: true },
+    image: { type: String },
     rating: {
       average: {
         type: Number,
@@ -55,16 +31,12 @@ const restaurantSchema = new mongoose.Schema(
         default: 0,
       },
     },
-    isOpen: {
-      type: Boolean,
-      default: true,
-    },
-    menuItems: [menuItemSchema], // Embed menu items
+    isOpen: { type: Boolean, default: true },
+    menuItems: [menuItemSchema],
   },
   { timestamps: true }
 );
 
-// Create the model
 const Restaurant = mongoose.model("Restaurant", restaurantSchema);
 
 module.exports = { Restaurant };
