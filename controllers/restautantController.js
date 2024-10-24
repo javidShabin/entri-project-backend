@@ -45,7 +45,7 @@ const createRestaurant = async (req, res) => {
     if (req.file) {
       console.log("Uploading file to Cloudinary...");
       uploadResult = await cloudinaryInstance.uploader.upload(req.file.path);
-      console.log("Upload result:", uploadResult);
+      console.log("Upload result");
     } else {
       console.log("No file to upload.");
     }
@@ -117,7 +117,28 @@ const updateRestautant = async (req, res) => {
 // Delete restaurant
 const deleteRestaurant = async (req, res) => {
   try {
-  } catch (error) {}
+    // Get id from request params
+    const restaurantId = req.params.id;
+
+    // Find and delete restaurant using the id
+    const deletedRestaurant = await Restaurant.findByIdAndDelete(restaurantId);
+
+    if (!deletedRestaurant) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Restaurant not found" });
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "Restaurant deleted successfully" });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting restaurant",
+      error: error.message,
+    });
+  }
 };
 
 module.exports = {
@@ -125,4 +146,5 @@ module.exports = {
   getRestautantById,
   createRestaurant,
   updateRestautant,
+  deleteRestaurant,
 };
