@@ -22,8 +22,13 @@ router.put("/forget-password", forgotPassword);
 router.get("/users-list", getAllUsers);
 router.post("/logout", userLogOut);
 router.get("/user-profile", userAuth, userProfile);
-router.put("/update-profile", userAuth, upload.single("image"), updateUserProfile);
-router.delete("/remove-user/:id", deleteUser)
-router.get("/check-user", checkUser)
+router.put(
+  "/update-profile",
+  userAuth,
+  upload.single("image"),
+  updateUserProfile
+);
+router.delete("/remove-user/:id", deleteUser);
+router.get("/check-user", checkUser);
 
 module.exports = { userRouter: router };
