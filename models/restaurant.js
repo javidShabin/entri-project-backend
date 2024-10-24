@@ -1,20 +1,5 @@
 const mongoose = require("mongoose");
 
-const menuItemSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true },
-    description: String,
-    price: { type: Number, required: true, min: 0 },
-    image: { type: String },
-    category: {
-      type: String,
-      enum: ["Appetizer", "Main Course", "Dessert", "Beverage"],
-      required: true, 
-    },
-  },
-  { timestamps: true }
-);
-
 const restaurantSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
@@ -32,7 +17,6 @@ const restaurantSchema = new mongoose.Schema(
       },
     },
     isOpen: { type: Boolean, default: true },
-    menuItems: [menuItemSchema],
   },
   { timestamps: true }
 );

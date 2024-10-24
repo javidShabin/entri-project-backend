@@ -1,3 +1,4 @@
+const { cloudinaryInstance } = require("../config/cloudinaryConfig");
 const { Restaurant } = require("../models/restaurant");
 
 // Get all restaurants
@@ -25,4 +26,42 @@ const getRestautantById = async (req, res) => {
   }
 };
 
-module.exports = { getAllRestaurants, getRestautantById };
+// Create restaurant
+const createRestaurant = async (req, res) => {
+  try {
+    // Destructure datas from req.body
+    const { name, ...rest } = req.body;
+    // check if required fileds present
+    if (!name || Object.keys(rest).length === 0) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+    // check if a restaurent with same name
+    const existRestaurant = await Restaurant.findOne({ name });
+    if (existRestaurant) {
+      return res.status(409).json({ message: "Restaurant already exists" });
+    }
+
+    let uploadResult;
+
+    if (req.file) {
+      console.log("Uploading file to Cloudinary...");
+      uploadResult = await cloudinaryInstance.uploader.upload(req.file.path);
+      console.log("Upload result:", uploadResult);
+    } else {
+      console.log("No file to upload.");
+    }
+    // Save restaurant data to database
+    const restaurant = new Restaurant({
+      name,
+      ...rest,
+      image: uploadResult.secure_url || "",
+    });
+    const savedRestaurant = await restaurant.save();
+
+    res.status(201).json(savedRestaurant);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getAllRestaurants, getRestautantById, createRestaurant };
