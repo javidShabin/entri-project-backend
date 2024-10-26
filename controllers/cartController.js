@@ -1,36 +1,84 @@
 const { Cart } = require("../models/cartModel");
+const { Menu } = require("../models/menuModel");
 
-// Add to cart
-const addToCart = async (req, res) => {
+// Add items in cart
+const addItemToCart = async (req, res) => {
   try {
-    // Destructure the values from req.body
-    const { userId, itemId, name, price, quantity } = req.body;
-    // Check if the cart exists; if not, create a new cart
-    let cart = await Cart.findOne({ userId });
-    if (!cart) {
-      cart = new Cart({ userId, items: [], totalAmount: 0 });
+    const { items } = req.body;
+    const userId = req.user.id;
+
+    // Validate the items input
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({
+        message: "Items array is required and should not be empty.",
+      });
     }
-    // Check if the item already exists in the cart
-    const itemIndex = cart.items.findIndex(
-      (item) => item.itemId.toString() === itemId
+
+    // Find or create the user's cart
+    let cart =
+      (await Cart.findOne({ userId })) || new Cart({ userId, items: [], totalPrice: 0 });
+
+    // Prepare to store menu items and their details
+    const menuItemIds = items.map(({ menuItem }) => menuItem);
+    const menuItems = await Menu.find({ _id: { $in: menuItemIds } });
+    const menuItemMap = Object.fromEntries(
+      menuItems.map((item) => [item._id.toString(), item])
     );
-    if (itemIndex > -1) {
-      // If the item exists, increase the quantity
-      cart.items[itemIndex].quantity += quantity;
-    } else {
-      // Otherwise, add a new item
-      cart.items.push({ itemId, name, price, quantity });
+
+    // Initialize total price change
+    let totalPriceChange = 0;
+
+    for (const { menuItem, quantity } of items) {
+      // Validate menuItem and quantity
+      if (!menuItem || quantity <= 0) {
+        return res.status(400).json({
+          message:
+            "Each item must have a valid menuItem ID and quantity greater than zero.",
+        });
+      }
+
+      const menuItemDetails = menuItemMap[menuItem];
+      if (!menuItemDetails) {
+        return res.status(404).json({
+          message: "Menu item not found",
+        });
+      }
+
+      // Check if item is already in the cart
+      const itemExists = cart.items.some(
+        (item) => item.menuItem.toString() === menuItem
+      );
+      if (itemExists) {
+        return res.status(400).json({
+          message: `Item is already in the cart.`,
+        });
+      }
+
+      // Add new item to cart
+      cart.items.push({
+        menuItem,
+        quantity,
+        image: menuItemDetails.image,
+        price: menuItemDetails.price,
+        ItemName: menuItemDetails.name,
+      });
+
+      // Calculate total price change
+      totalPriceChange += menuItemDetails.price * quantity;
     }
-    // Update the total amount
-    cart.totalAmount += price * quantity;
-    // Save the cart to the database
+
+    // Update total price in the cart
+    cart.totalPrice += totalPriceChange; // Add to existing total price
+
+    // Save the cart
     await cart.save();
-    // Send back the updated cart details
     res.status(200).json(cart);
   } catch (error) {
-    // Log the error and send a response with an error message
-    console.error("Error adding item to cart:", error);
-    res.status(500).json({ message: "Failed to add item to cart", error });
+    console.error(error);
+    res.status(500).json({
+      message: "An error occurred while adding item to cart.",
+      error: error.message,
+    });
   }
 };
 
@@ -55,7 +103,7 @@ const clearCart = async () => {
   } catch (error) {}
 };
 module.exports = {
-  addToCart,
+  addItemToCart,
   updateCart,
   cartDetails,
   removeFromCart,

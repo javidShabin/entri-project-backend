@@ -115,11 +115,10 @@ const verifyOtpAndCreateUser = async (req, res) => {
       email: newUser.email,
       role: "customer",
     });
-
     // Set token as cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
     });
 
@@ -327,10 +326,11 @@ const deleteUser = async (req, res) => {
   }
 };
 // Check user
-const checkUser = async () => {
+const checkUser = async (req, res) => {
   try {
     // Get user from req.user
-    const { user } = req;
+    const user = req.user
+    console.log(user)
     // Check user authorizes or not
     if (!user) {
       return res

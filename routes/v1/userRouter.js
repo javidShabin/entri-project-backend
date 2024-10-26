@@ -29,6 +29,6 @@ router.put(
   updateUserProfile
 );
 router.delete("/remove-user/:id", deleteUser);
-router.get("/check-user", checkUser);
+router.get("/check-user", userAuth, checkUser);
 
 module.exports = { userRouter: router };
