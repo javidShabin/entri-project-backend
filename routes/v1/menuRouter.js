@@ -22,8 +22,8 @@ router.get("/menu/:restaurantId/search", searchMenuByName);
 // Filter menu bt price
 router.get("/menu/:restaurantId/filter/price", filterMenusByPrice);
 // Update menu
-router.put("/update-menu", updateMenu);
+router.put("/update-menu/:menuId", updateMenu);
 // delete menu
-router.delete("/remove-menu", deleteMenu);
+router.delete("/remove-menu/:meuId", deleteMenu);
 
 module.exports = { menuRouter: router };
