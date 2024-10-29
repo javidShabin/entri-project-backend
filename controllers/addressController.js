@@ -3,66 +3,77 @@ const { Address } = require("../models/addressModel");
 // Create address
 const createAddress = async (req, res) => {
   try {
-    // Destructur the data from req.body
     const { name, email, street, city, postalCode, country, phone } = req.body;
-    const userId = req.user.id; // Get user id from req.user
-    // Check if requird fields are presented
+    const userId = req.user.id;
+
+    // Check for required fields
     if (!name || !street || !city || !postalCode || !phone) {
-      return res.status(400).json({
-        message: "All fields are required",
-      });
+      return res.status(400).json({ message: "All fields are required" });
     }
-    // Add and save the address to datebade
-    const address = new Address({
+
+    // Save the new address
+    const address = await Address.create({
       name,
       email,
       street,
       city,
       postalCode,
-      phone,
       country,
+      phone,
       user: userId,
     });
-    await address.save();
-    res.status(201).json(address); // Send the response including address
+    res.status(201).json({ message: "Address created successfully", address });
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+// Update address
 const updateAddress = async (req, res) => {
   try {
-    const addressId = req.params.id; //Address id from req.params
-    const updatedData = req.body; // Updated address form req.body
+    const { id: addressId } = req.params;
+    const { user, ...updatedData } = req.body; // Avoid updating user field directly
 
-    // Find and add the updated address using id
     const address = await Address.findByIdAndUpdate(addressId, updatedData, {
       new: true,
     });
-    res.status(200).json(address); // Send the resonse the updated uddress
+
+    if (!address) {
+      return res.status(404).json({ message: "Address not found" });
+    }
+
+    res.status(200).json({ message: "Address updated successfully", address });
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+// Get addresses
 const getAddress = async (req, res) => {
   try {
-    const userId = req.user.id; // Get user id from reql.user
-    // Get the address using address id
+    const userId = req.user.id;
     const addresses = await Address.find({ user: userId });
-    // Send the response includig address
-    res.status(200).json(addresses);
+
+    res.status(200).json({ addresses });
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+// Remove address
 const removeAddress = async (req, res) => {
   try {
-    const userId = req.user.id; // Get address from req.user
-    // Find and delete the address using the user id
-    await Address.findByIdAndDelete(userId);
-    // Send message as response
+    const { id: addressId } = req.params;
+
+    const address = await Address.findByIdAndDelete(addressId);
+
+    if (!address) {
+      return res.status(404).json({ message: "Address not found" });
+    }
+
     res.status(200).json({ message: "Address deleted successfully" });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
