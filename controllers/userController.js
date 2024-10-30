@@ -8,15 +8,15 @@ const { cloudinaryInstance } = require("../config/cloudinaryConfig");
 // Register user
 const userRegistration = async (req, res) => {
   try {
-    const { email, password, confirmPass, name, phone, ...rest } = req.body;
+    const { email, password, conformPassword, name, phone, ...rest } = req.body;
 
     // Check if required fields are present
-    if (!email || !password || !confirmPass || !name || !phone) {
+    if (!email || !password || !conformPassword || !name || !phone) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     // Check if passwords match
-    if (password !== confirmPass) {
+    if (password !== conformPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
@@ -128,7 +128,6 @@ const verifyOtpAndCreateUser = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "User created successfully",
-      token, // Optionally return the token
     });
   } catch (error) {
     console.error(error);
